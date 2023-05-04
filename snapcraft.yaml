@@ -45,9 +45,9 @@ parts:
       craftctl default
       craftctl set version=$(git describe --tags --abbrev=0)
       sed -e 's|Icon=io.github.Bavarder.Bavarder|Icon=${SNAP}/usr/share/icons/hicolor/scalable/apps/io.github.Bavarder.Bavarder.svg|' -i data/io.github.Bavarder.Bavarder.desktop.in
-    build-packages:
-      - python3-lxml 
-    
+    python-packages:
+      - lxml==4.9.2
+      
     override-build: |
       craftctl default
       # WORKAROUND: Use python from search path, the path detected by meson doesn't exist when running the Snap
