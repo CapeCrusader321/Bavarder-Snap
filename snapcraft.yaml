@@ -1,0 +1,54 @@
+name: bavarder
+base: core22
+adopt-info: bavarder
+grade: stable
+confinement: strict
+compression: lzo
+architectures:
+  - build-on: amd64
+    build-for: amd64
+
+slots:
+  bavarder:
+    interface: dbus
+    bus: session
+    name: io.github.Bavarder.Bavarder
+
+
+environment:
+  # WORKAROUND: Add python modules in Snap to search path
+  PYTHONPATH: ${SNAP}/usr/lib/python3/dist-packages:$PYTHONPATH
+
+apps:
+  bavarder:
+    command: usr/bin/bavarder
+    extensions: [gnome]
+    plugs:
+      - home
+      - raw-usb
+      - network
+      - network-status
+      - optical-drive
+      - removable-media
+    common-id: io.github.Bavarder.Bavarder
+    desktop: usr/share/applications/io.github.Bavarder.Bavarder.desktop
+    
+    
+parts:
+  bavarder:
+    source: https://github.com/Bavarder/Bavarder.git
+    plugin: meson
+    parse-info: [usr/share/metainfo/io.github.Bavarder.Bavarder.appdata.xml.in]
+    meson-parameters:
+      - --prefix=/snap/bavarder/current/usr
+    override-pull: |
+      craftctl default
+      craftctl set version=$(git describe --tags --abbrev=0)
+      sed -e 's|Icon=io.github.Bavarder.Bavarder|Icon=${SNAP}/usr/share/icons/hicolor/scalable/apps/io.github.Bavarder.Bavarder.svg|' -i data/io.github.Bavarder.Bavarder.desktop.in
+    override-build: |
+      craftctl default
+      # WORKAROUND: Use python from search path, the path detected by meson doesn't exist when running the Snap
+      sed -e '1c#!/usr/bin/env python3' -i ${CRAFT_PART_INSTALL}/snap/bavarder/current/usr/bin/bavarder
+    organize:
+      snap/bavarder/current/usr: usr
+ 
