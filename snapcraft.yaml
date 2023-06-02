@@ -6,7 +6,8 @@ confinement: strict
 compression: lzo
 architectures:
   - build-on: amd64
-    build-for: amd64
+  - build-on: arm64
+  - build-on: armhf
 
 slots:
   bavarder:
@@ -25,13 +26,13 @@ apps:
     extensions: [gnome]
     plugs:
       - home
-      - raw-usb
       - network
+      - network-bind
       - network-status
       - optical-drive
       - removable-media
     common-id: io.github.Bavarder.Bavarder
-    desktop: usr/share/applications/io.github.Bavarder.Bavarder.desktop
+    desktop: usr/share/applications/io.github.Bavarder.Bavarder.desktop.in
     
     
 parts:
@@ -47,7 +48,6 @@ parts:
     override-pull: |
       craftctl default
       craftctl set version=$(git describe --tags --abbrev=0)
-      sed -e 's|Icon=io.github.Bavarder.Bavarder|Icon=${SNAP}/usr/share/icons/hicolor/scalable/apps/io.github.Bavarder.Bavarder.svg|' -i data/io.github.Bavarder.Bavarder.desktop.in
     override-build: |
       craftctl default
       # WORKAROUND: Use python from search path, the path detected by meson doesn't exist when running the Snap
